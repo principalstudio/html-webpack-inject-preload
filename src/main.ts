@@ -3,13 +3,12 @@ import {compilation, Compiler, Plugin} from 'webpack';
 
 declare namespace HtmlWebpackInjectPreload {
   interface Options {
-    excludeOutputNames: RegExp[];
     files: HtmlWebpackInjectPreload.File[];
   }
 
   interface File {
     match: RegExp;
-    attributes: Record<string, string | boolean>;
+    attributes: Record<string, string|boolean>;
   }
 }
 
@@ -24,11 +23,11 @@ interface HtmlWebpackPluginData {
  *
  * @example
  * new HtmlWebpackInjectPreload({
- *  excludeOutputNames: [/scripts-hashed/],
  *  files: [
  *    {
  *      match: /.*\.woff2/,
- *      attributes: { rel: 'preload', as: 'font', type: 'font/woff2', crossorigin: true },
+ *      attributes: { rel: 'preload', as: 'font', type: 'font/woff2',
+ * crossorigin: true },
  *    },
  *    {
  *      match: /vendors\.[a-z-0-9]*.css/,
@@ -40,10 +39,10 @@ interface HtmlWebpackPluginData {
  * @class InjectPreloadFiles
  */
 class HtmlWebpackInjectPreload implements Plugin {
-  options: HtmlWebpackInjectPreload.Options = {
-    excludeOutputNames: [],
+  private options: HtmlWebpackInjectPreload.Options = {
     files: [],
   };
+  private replaceString = '<!-- html-webpack-inject-preload -->';
 
   /**
    * Creates an instance of HtmlWebpackInjectPreload.
@@ -52,12 +51,6 @@ class HtmlWebpackInjectPreload implements Plugin {
    */
   constructor(options: HtmlWebpackInjectPreload.Options) {
     this.options = Object.assign(this.options, options);
-  }
-
-  private checkMatch(regexpArray: RegExp[], value: string) {
-    return regexpArray.some(function (regexp) {
-      return regexp.test(value);
-    });
   }
 
   public generateLink(href: string) {
@@ -73,9 +66,8 @@ class HtmlWebpackInjectPreload implements Plugin {
         }
 
         for (const attribute in file.attributes) {
-          if (
-            Object.prototype.hasOwnProperty.call(file.attributes, attribute)
-          ) {
+          if (Object.prototype.hasOwnProperty.call(
+                  file.attributes, attribute)) {
             const value = file.attributes[attribute];
             if (value === true) {
               linkAttributes.push(`${attribute}`);
@@ -85,9 +77,9 @@ class HtmlWebpackInjectPreload implements Plugin {
           }
         }
 
-        return linkAttributes.length > 0
-          ? `<link ${linkAttributes.join(' ')}>`
-          : false;
+        return linkAttributes.length > 0 ?
+            `<link ${linkAttributes.join(' ')}>` :
+            false;
       }
     }
 
@@ -95,20 +87,13 @@ class HtmlWebpackInjectPreload implements Plugin {
   }
 
   private addLinks(
-    compilation: compilation.Compilation,
-    htmlPluginData: HtmlWebpackPluginData,
+      compilation: compilation.Compilation,
+      htmlPluginData: HtmlWebpackPluginData,
   ) {
-    const options = this.options;
     const links: string[] = [];
 
     // Bail out early if we're configured to exclude this file.
-    if (
-      this.checkMatch(
-        options.excludeOutputNames,
-        // @ts-ignore
-        htmlPluginData.plugin.options.filename,
-      )
-    ) {
+    if (!htmlPluginData.html.includes(this.replaceString)) {
       return htmlPluginData;
     }
 
@@ -123,8 +108,8 @@ class HtmlWebpackInjectPreload implements Plugin {
     });
 
     htmlPluginData.html = htmlPluginData.html.replace(
-      '<!-- html-webpack-inject-preload -->',
-      links.join(''),
+        this.replaceString,
+        links.join(''),
     );
 
     return htmlPluginData;
@@ -132,21 +117,23 @@ class HtmlWebpackInjectPreload implements Plugin {
 
   apply(compiler: Compiler) {
     compiler.hooks.compilation.tap('HtmlWebpackInjectPreload', compilation => {
-      // @ts-ignore
-      const hook = compilation.hooks.htmlWebpackPluginAfterHtmlProcessing
-        ? // @ts-ignore
-          compilation.hooks.htmlWebpackPluginAfterHtmlProcessing
-        : HtmlWebpackPlugin.getHooks(compilation).beforeEmit;
+      const hook = compilation
+                       .hooks
+                       // @ts-ignore
+                       .htmlWebpackPluginAfterHtmlProcessing ?
+          // @ts-ignore
+          compilation.hooks.htmlWebpackPluginAfterHtmlProcessing :
+          HtmlWebpackPlugin.getHooks(compilation).beforeEmit;
 
       hook.tapAsync(
-        'HtmlWebpackInjectPreload',
-        (htmlPluginData: HtmlWebpackPluginData, callback: any) => {
-          try {
-            callback(null, this.addLinks(compilation, htmlPluginData));
-          } catch (error) {
-            callback(error);
-          }
-        },
+          'HtmlWebpackInjectPreload',
+          (htmlPluginData: HtmlWebpackPluginData, callback: any) => {
+            try {
+              callback(null, this.addLinks(compilation, htmlPluginData));
+            } catch (error) {
+              callback(error);
+            }
+          },
       );
     });
   }
