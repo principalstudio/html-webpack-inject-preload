@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/principalstudio/principal-purgecss-extractor.git"
+    "url": "git+https://github.com/principalstudio/html-webpack-inject-preload.git"
   },
   "keywords": [
     "webpack",
@@ -26,9 +26,9 @@
   ],
   "author": "Principal Studio",
   "bugs": {
-    "url": "https://github.com/principalstudio/principal-purgecss-extractor/issues"
+    "url": "https://github.com/principalstudio/html-webpack-inject-preload/issues"
   },
-  "homepage": "https://github.com/principalstudio/principal-purgecss-extractor#readme",
+  "homepage": "https://github.com/principalstudio/html-webpack-inject-preload#readme",
   "devDependencies": {
     "@types/jest": "^26.0.9",
     "@types/node": "^14.0.27",
