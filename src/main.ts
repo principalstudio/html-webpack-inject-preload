@@ -1,5 +1,5 @@
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-import {compilation, Compiler, Plugin} from 'webpack';
+import type {default as HtmlWebpackPluginInstance} from 'html-webpack-plugin';
+import type {compilation, Compiler, Plugin} from 'webpack';
 
 declare namespace HtmlWebpackInjectPreload {
   interface Options {
@@ -8,14 +8,14 @@ declare namespace HtmlWebpackInjectPreload {
 
   interface File {
     match: RegExp;
-    attributes: Record<string, string|boolean>;
+    attributes: Record<string, string | boolean>;
   }
 }
 
 interface HtmlWebpackPluginData {
   html: string;
   outputName: string;
-  plugin: HtmlWebpackPlugin;
+  plugin: HtmlWebpackPluginInstance;
 }
 
 /**
@@ -53,6 +53,27 @@ class HtmlWebpackInjectPreload implements Plugin {
     this.options = Object.assign(this.options, options);
   }
 
+  /**
+   * Extract HTMLWebpack Plugin by jahed
+   *
+   * @param compiler
+   */
+  private extractHtmlWebpackPluginModule = (
+    compiler: Compiler,
+  ): typeof HtmlWebpackPluginInstance | null => {
+    const htmlWebpackPlugin = (compiler.options.plugins || []).find(plugin => {
+      return plugin.constructor.name === 'HtmlWebpackPlugin';
+    }) as typeof HtmlWebpackPluginInstance | undefined;
+    if (!htmlWebpackPlugin) {
+      return null;
+    }
+    const HtmlWebpackPlugin = htmlWebpackPlugin.constructor;
+    if (!HtmlWebpackPlugin || !('getHooks' in HtmlWebpackPlugin)) {
+      return null;
+    }
+    return HtmlWebpackPlugin as typeof HtmlWebpackPluginInstance;
+  };
+
   public generateLink(href: string) {
     const linkAttributes: string[] = [];
 
@@ -66,8 +87,9 @@ class HtmlWebpackInjectPreload implements Plugin {
         }
 
         for (const attribute in file.attributes) {
-          if (Object.prototype.hasOwnProperty.call(
-                  file.attributes, attribute)) {
+          if (
+            Object.prototype.hasOwnProperty.call(file.attributes, attribute)
+          ) {
             const value = file.attributes[attribute];
             if (value === true) {
               linkAttributes.push(`${attribute}`);
@@ -77,9 +99,11 @@ class HtmlWebpackInjectPreload implements Plugin {
           }
         }
 
-        return linkAttributes.length > 0 ?
-            `<link ${linkAttributes.join(' ')}>` :
-            false;
+        console.log(`Add ${href} preload`);
+
+        return linkAttributes.length > 0
+          ? `<link ${linkAttributes.join(' ')}>`
+          : false;
       }
     }
 
@@ -87,8 +111,8 @@ class HtmlWebpackInjectPreload implements Plugin {
   }
 
   private addLinks(
-      compilation: compilation.Compilation,
-      htmlPluginData: HtmlWebpackPluginData,
+    compilation: compilation.Compilation,
+    htmlPluginData: HtmlWebpackPluginData,
   ) {
     const links: string[] = [];
 
@@ -108,8 +132,8 @@ class HtmlWebpackInjectPreload implements Plugin {
     });
 
     htmlPluginData.html = htmlPluginData.html.replace(
-        this.replaceString,
-        links.join(''),
+      this.replaceString,
+      links.join(''),
     );
 
     return htmlPluginData;
@@ -117,23 +141,23 @@ class HtmlWebpackInjectPreload implements Plugin {
 
   apply(compiler: Compiler) {
     compiler.hooks.compilation.tap('HtmlWebpackInjectPreload', compilation => {
-      const hook = compilation
-                       .hooks
-                       // @ts-ignore
-                       .htmlWebpackPluginAfterHtmlProcessing ?
-          // @ts-ignore
-          compilation.hooks.htmlWebpackPluginAfterHtmlProcessing :
-          HtmlWebpackPlugin.getHooks(compilation).beforeEmit;
+      const HtmlWebpackPlugin = this.extractHtmlWebpackPluginModule(compiler);
+      if (!HtmlWebpackPlugin) {
+        throw new Error(
+          'HtmlWebpackInjectPreload needs to be used with html-webpack-plugin@4',
+        );
+      }
 
-      hook.tapAsync(
-          'HtmlWebpackInjectPreload',
-          (htmlPluginData: HtmlWebpackPluginData, callback: any) => {
-            try {
-              callback(null, this.addLinks(compilation, htmlPluginData));
-            } catch (error) {
-              callback(error);
-            }
-          },
+      const hooks = HtmlWebpackPlugin.getHooks(compilation);
+      hooks.afterTemplateExecution.tapAsync(
+        'HtmlWebpackInjectPreload',
+        (htmlPluginData: HtmlWebpackPluginData, callback: any) => {
+          try {
+            callback(null, this.addLinks(compilation, htmlPluginData));
+          } catch (error) {
+            callback(error);
+          }
+        },
       );
     });
   }

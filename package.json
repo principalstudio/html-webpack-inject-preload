@@ -1,6 +1,6 @@
 {
   "name": "@principalstudio/html-webpack-inject-preload",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A html webpack plugin for injecting <link rel='preload'>",
   "main": "lib/main.js",
   "types": "lib/main.d.ts",
@@ -8,6 +8,7 @@
     "build": "tsc",
     "test": "jest --config=./test/jest.config.js",
     "all": "npm run build && npm run test && npm link",
+    "all-quick": "npm run build && npm link",
     "prepublishOnly": "npm run build"
   },
   "engines": {
@@ -30,16 +31,16 @@
   },
   "homepage": "https://github.com/principalstudio/html-webpack-inject-preload#readme",
   "devDependencies": {
-    "@types/jest": "^26.0.9",
-    "@types/node": "^14.0.27",
-    "@types/webpack": "^4.41.21",
-    "@typescript-eslint/parser": "^3.9.0",
-    "eslint": "^7.6.0",
-    "html-webpack-plugin": "^4.3.0",
-    "jest": "^26.3.0",
-    "prettier": "^2.0.5",
-    "ts-jest": "^26.1.4",
-    "typescript": "^3.9.7",
-    "webpack": "^4.44.1"
+    "@types/jest": "^26.0.14",
+    "@types/node": "^14.11.2",
+    "@types/webpack": "^4.41.22",
+    "@typescript-eslint/parser": "^4.2.0",
+    "eslint": "^7.9.0",
+    "html-webpack-plugin": "^4.5.0",
+    "jest": "^26.4.2",
+    "prettier": "^2.1.2",
+    "ts-jest": "^26.4.0",
+    "typescript": "^4.0.3",
+    "webpack": "^4.44.2"
   }
 }
