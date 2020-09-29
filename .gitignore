@@ -98,3 +98,4 @@ src/test.ts
 src/*.js
 __tests__/CHANGELOG-heavy.md
 lib
+test/dist/

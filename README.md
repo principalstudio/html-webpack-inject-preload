@@ -29,22 +29,29 @@ module.exports = {
       files: [
         {
           match: /.*\.woff2/,
-          attributes: { rel: 'preload', as: 'font', type: 'font/woff2', crossorigin: true },
+          attributes: {as: 'font', type: 'font/woff2', crossorigin: true },
         },
         {
           match: /vendors\.[a-z-0-9]*.css/,
-          attributes: { rel: 'preload', as: 'style' },
+          attributes: {as: 'style' },
         },
-      ],
+      ]
     })
   ]
 }
 ```
 
+**Options**
 
-**HTML file**
+* files: An array of files object
+  * match: A regular expression to target files you want to preload
+  * attributes: Any attributes you want to use. The plugin will add the attribute `rel="preload"` by default.
 
-Add `<!-- html-webpack-inject-preload -->` to indicate where to inject preload links.
+**Usage**
+
+The plugin is really simple to use. The plugin injects in `headTags`, before any link, the preload elements.
+
+For example
 
 ```html
 <!DOCTYPE html>
@@ -52,8 +59,24 @@ Add `<!-- html-webpack-inject-preload -->` to indicate where to inject preload l
   <head>
     <meta charset="utf-8">
     <title>Webpack App</title>
-    <!-- html-webpack-inject-preload -->
-    <link href="dist/main.css">
+    <%= htmlWebpackPlugin.tags.headTags %>
+  </head>
+  <body>
+    <script src="index_bundle.js"></script>
+  </body>
+</html>
+```
+
+will generate
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Webpack App</title>
+    <link href="dist/fonts/font.woff2" rel="preload" type="font/woff2" crossorigin>
+    <link href="dist/css/main.css">
   </head>
   <body>
     <script src="index_bundle.js"></script>
