@@ -1,11 +1,15 @@
 import HtmlWebpackInjectPreload from '../src/main';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import webpack from 'webpack';
+import path from 'path';
+import fs from 'fs';
 
 const options: HtmlWebpackInjectPreload.Options = {
   files: [
     {
       match: /.*\.woff2/,
       attributes: {
-        rel: 'preload',
         as: 'font',
         type: 'font/woff2',
         crossorigin: true,
@@ -13,7 +17,7 @@ const options: HtmlWebpackInjectPreload.Options = {
     },
     {
       match: /.*\.css/,
-      attributes: {rel: 'preload', as: 'style', href: 'test-alt.css'},
+      attributes: {as: 'style', href: 'test-alt.css'},
     },
     {
       match: /.*\.null/,
@@ -23,24 +27,51 @@ const options: HtmlWebpackInjectPreload.Options = {
 };
 
 describe('HTMLWebpackInjectPreload', () => {
-  it('generateLink', async () => {
-    const expectCss = '<link rel="preload" as="style" href="test-alt.css">';
-    const linkCss = new HtmlWebpackInjectPreload(options).generateLink(
-        'test.css',
-    );
-    expect(linkCss).toBe(expectCss);
+  it('webpack plugin', done => {
+    const compiler = webpack({
+      entry: path.join(__dirname, 'entry.js'),
+      module: {
+        rules: [
+          {
+            test: /\.css$/i,
+            use: [MiniCssExtractPlugin.loader, 'css-loader'],
+          },
+          {
+            test: /\.(woff|woff2)$/,
+            use: [
+              {
+                loader: 'url-loader',
+                options: {
+                  name: '[name].[ext]',
+                  limit: 8192,
+                },
+              },
+            ],
+          },
+        ],
+      },
+      output: {
+        path: path.join(__dirname, 'dist'),
+      },
+      plugins: [
+        new MiniCssExtractPlugin(),
+        new HtmlWebpackPlugin(),
+        new HtmlWebpackInjectPreload(options),
+      ],
+    });
+    compiler.run((err, stats) => {
+      if (err) expect(err).toBeNull();
 
-    const expectWoff2 =
-        '<link href="test.woff2" rel="preload" as="font" type="font/woff2" crossorigin>';
-    const linkWoff2 = new HtmlWebpackInjectPreload(options).generateLink(
-        'test.woff2',
-    );
-    expect(linkWoff2).toBe(expectWoff2);
-
-    const expectNull = false;
-    const linkNull = new HtmlWebpackInjectPreload(options).generateLink(
-        'test.null',
-    );
-    expect(linkNull).toBe(expectNull);
+      const result = fs.readFileSync(
+        path.join(__dirname, 'dist/index.html'),
+        'utf8',
+      );
+      const expected = fs.readFileSync(
+        path.join(__dirname, 'expected.html'),
+        'utf8',
+      );
+      expect(expected).toBe(result);
+      done();
+    });
   });
 });

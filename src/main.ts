@@ -1,4 +1,7 @@
-import type {default as HtmlWebpackPluginInstance} from 'html-webpack-plugin';
+import type {
+  default as HtmlWebpackPluginInstance,
+  HtmlTagObject,
+} from 'html-webpack-plugin';
 import type {compilation, Compiler, Plugin} from 'webpack';
 
 declare namespace HtmlWebpackInjectPreload {
@@ -13,7 +16,8 @@ declare namespace HtmlWebpackInjectPreload {
 }
 
 interface HtmlWebpackPluginData {
-  html: string;
+  headTags: Array<HtmlTagObject | HtmlTagObject>;
+  bodyTags: Array<HtmlTagObject | HtmlTagObject>;
   outputName: string;
   plugin: HtmlWebpackPluginInstance;
 }
@@ -42,7 +46,6 @@ class HtmlWebpackInjectPreload implements Plugin {
   private options: HtmlWebpackInjectPreload.Options = {
     files: [],
   };
-  private replaceString = '<!-- html-webpack-inject-preload -->';
 
   /**
    * Creates an instance of HtmlWebpackInjectPreload.
@@ -74,67 +77,42 @@ class HtmlWebpackInjectPreload implements Plugin {
     return HtmlWebpackPlugin as typeof HtmlWebpackPluginInstance;
   };
 
-  public generateLink(href: string) {
-    const linkAttributes: string[] = [];
-
-    for (let index = 0; index < this.options.files.length; index++) {
-      const file = this.options.files[index];
-
-      if (file.match.test(href)) {
-        const hasHref = Object.keys(file.attributes).includes('href');
-        if (!hasHref) {
-          linkAttributes.push(`href="${href}"`);
-        }
-
-        for (const attribute in file.attributes) {
-          if (
-            Object.prototype.hasOwnProperty.call(file.attributes, attribute)
-          ) {
-            const value = file.attributes[attribute];
-            if (value === true) {
-              linkAttributes.push(`${attribute}`);
-            } else if (value !== false) {
-              linkAttributes.push(`${attribute}="${value}"`);
-            }
-          }
-        }
-
-        console.log(`Add ${href} preload`);
-
-        return linkAttributes.length > 0
-          ? `<link ${linkAttributes.join(' ')}>`
-          : false;
-      }
-    }
-
-    return false;
-  }
-
   private addLinks(
     compilation: compilation.Compilation,
     htmlPluginData: HtmlWebpackPluginData,
   ) {
-    const links: string[] = [];
-
-    // Bail out early if we're configured to exclude this file.
-    if (!htmlPluginData.html.includes(this.replaceString)) {
-      return htmlPluginData;
-    }
-
-    const files = new Set(Object.keys(compilation.assets));
+    const assets = new Set(Object.keys(compilation.assets));
     compilation.chunks.forEach(chunk => {
-      chunk.files.forEach((file: string) => files.add(file));
+      chunk.files.forEach((file: string) => assets.add(file));
     });
 
-    files.forEach(file => {
-      const link = this.generateLink(file);
-      if (link) links.push(link);
-    });
-
-    htmlPluginData.html = htmlPluginData.html.replace(
-      this.replaceString,
-      links.join(''),
+    const linkIndex = htmlPluginData.headTags.findIndex(
+      tag => tag.tagName === 'link',
     );
+
+    assets.forEach(asset => {
+      for (let index = 0; index < this.options.files.length; index++) {
+        const file = this.options.files[index];
+        let href = file.attributes ? file.attributes.href : false;
+        if (!href) {
+          href = asset;
+        }
+
+        if (file.match.test(asset)) {
+          const preload = {
+            tagName: 'link',
+            attributes: Object.assign({rel: 'preload', href}, file.attributes),
+            voidTag: true,
+          };
+
+          if (linkIndex > -1) {
+            htmlPluginData.headTags.splice(linkIndex, 0, preload);
+          } else {
+            htmlPluginData.headTags.unshift(preload);
+          }
+        }
+      }
+    });
 
     return htmlPluginData;
   }
@@ -149,9 +127,9 @@ class HtmlWebpackInjectPreload implements Plugin {
       }
 
       const hooks = HtmlWebpackPlugin.getHooks(compilation);
-      hooks.afterTemplateExecution.tapAsync(
+      hooks.alterAssetTagGroups.tapAsync(
         'HtmlWebpackInjectPreload',
-        (htmlPluginData: HtmlWebpackPluginData, callback: any) => {
+        (htmlPluginData, callback: any) => {
           try {
             callback(null, this.addLinks(compilation, htmlPluginData));
           } catch (error) {
