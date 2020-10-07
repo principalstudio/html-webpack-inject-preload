@@ -61,6 +61,7 @@ describe('HTMLWebpackInjectPreload', () => {
     });
     compiler.run((err, stats) => {
       if (err) expect(err).toBeNull();
+      expect(stats.compilation.errors.length).toBe(0);
 
       const result = fs.readFileSync(
         path.join(__dirname, 'dist/index.html'),

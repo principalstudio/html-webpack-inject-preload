@@ -1,4 +1,5 @@
-dist/
+/test/dist/
 lib/
 node_modules/
 README.md
+*.html

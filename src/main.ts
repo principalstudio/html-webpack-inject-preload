@@ -98,10 +98,12 @@ class HtmlWebpackInjectPreload implements Plugin {
           href = asset;
         }
 
+        href = href[0] === '/' ? href : '/' + href;
+
         if (file.match.test(asset)) {
           const preload = {
             tagName: 'link',
-            attributes: Object.assign({rel: 'preload', href}, file.attributes),
+            attributes: Object.assign(file.attributes, {rel: 'preload', href}),
             voidTag: true,
           };
 
