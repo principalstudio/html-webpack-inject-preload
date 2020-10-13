@@ -1,7 +1,7 @@
 import HtmlWebpackInjectPreload from '../src/main';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import webpack from 'webpack';
+import webpack, { WebpackPluginInstance } from 'webpack';
 import path from 'path';
 import fs from 'fs';
 
@@ -52,16 +52,22 @@ describe('HTMLWebpackInjectPreload', () => {
       },
       output: {
         path: path.join(__dirname, 'dist'),
+        publicPath: path.resolve(__dirname),
       },
       plugins: [
-        new MiniCssExtractPlugin(),
+        new MiniCssExtractPlugin() as WebpackPluginInstance,
         new HtmlWebpackPlugin(),
         new HtmlWebpackInjectPreload(options),
       ],
     });
     compiler.run((err, stats) => {
       if (err) expect(err).toBeNull();
-      expect(stats.compilation.errors.length).toBe(0);
+
+      const statsErrors = stats ? stats.compilation.errors : [];
+      if (statsErrors.length > 0) {
+        console.error(statsErrors);
+      }
+      expect(statsErrors.length).toBe(0);
 
       const result = fs.readFileSync(
         path.join(__dirname, 'dist/index.html'),

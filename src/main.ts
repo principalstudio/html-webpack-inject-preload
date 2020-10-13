@@ -2,7 +2,7 @@ import type {
   default as HtmlWebpackPluginInstance,
   HtmlTagObject,
 } from 'html-webpack-plugin';
-import type {compilation, Compiler, Plugin} from 'webpack';
+import type {Compilation, Compiler, WebpackPluginInstance} from 'webpack';
 
 declare namespace HtmlWebpackInjectPreload {
   interface Options {
@@ -42,7 +42,7 @@ interface HtmlWebpackPluginData {
  *
  * @class InjectPreloadFiles
  */
-class HtmlWebpackInjectPreload implements Plugin {
+class HtmlWebpackInjectPreload implements WebpackPluginInstance {
   private options: HtmlWebpackInjectPreload.Options = {
     files: [],
   };
@@ -78,13 +78,14 @@ class HtmlWebpackInjectPreload implements Plugin {
   };
 
   private addLinks(
-    compilation: compilation.Compilation,
+    compilation: Compilation,
     htmlPluginData: HtmlWebpackPluginData,
   ) {
     const assets = new Set(Object.keys(compilation.assets));
     compilation.chunks.forEach(chunk => {
       chunk.files.forEach((file: string) => assets.add(file));
     });
+    console.log(assets);
 
     const linkIndex = htmlPluginData.headTags.findIndex(
       tag => tag.tagName === 'link',
