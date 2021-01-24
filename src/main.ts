@@ -85,7 +85,6 @@ class HtmlWebpackInjectPreload implements WebpackPluginInstance {
     compilation.chunks.forEach(chunk => {
       chunk.files.forEach((file: string) => assets.add(file));
     });
-    console.log(assets);
 
     const linkIndex = htmlPluginData.headTags.findIndex(
       tag => tag.tagName === 'link',
@@ -102,10 +101,13 @@ class HtmlWebpackInjectPreload implements WebpackPluginInstance {
         href = href[0] === '/' ? href : '/' + href;
 
         if (file.match.test(asset)) {
-          const preload = {
+          const preload: HtmlTagObject = {
             tagName: 'link',
             attributes: Object.assign(file.attributes, {rel: 'preload', href}),
             voidTag: true,
+            meta: {
+              plugin: 'html-webpack-inject-preload'
+            }
           };
 
           if (linkIndex > -1) {

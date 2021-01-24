@@ -5,7 +5,7 @@ This plugin allows to add preload links anywhere you want.
 
 # Installation
 
-You need to have HTMLWebpackPlugin v4 to make this plugin work.
+You need to have HTMLWebpackPlugin v5 to make this plugin work.
 
 ```
 npm i -D @principalstudio/html-webpack-inject-preload

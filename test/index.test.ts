@@ -29,6 +29,8 @@ const options: HtmlWebpackInjectPreload.Options = {
 describe('HTMLWebpackInjectPreload', () => {
   it('webpack plugin', done => {
     const compiler = webpack({
+      mode: 'production',
+      context: path.resolve(__dirname),
       entry: path.join(__dirname, 'entry.js'),
       module: {
         rules: [
@@ -52,7 +54,7 @@ describe('HTMLWebpackInjectPreload', () => {
       },
       output: {
         path: path.join(__dirname, 'dist'),
-        publicPath: path.resolve(__dirname),
+        publicPath: '/',
       },
       plugins: [
         new MiniCssExtractPlugin() as WebpackPluginInstance,
