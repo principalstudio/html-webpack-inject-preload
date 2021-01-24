@@ -1,6 +1,6 @@
 {
   "name": "@principalstudio/html-webpack-inject-preload",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "A html webpack plugin for injecting <link rel='preload'>",
   "main": "lib/main.js",
   "types": "lib/main.d.ts",
@@ -31,21 +31,19 @@
   },
   "homepage": "https://github.com/principalstudio/html-webpack-inject-preload#readme",
   "devDependencies": {
-    "@types/jest": "^26.0.14",
-    "@types/mini-css-extract-plugin": "^0.9.1",
-    "@types/node": "^14.11.5",
-    "@types/webpack": "^4.41.22",
-    "@typescript-eslint/parser": "^4.4.0",
-    "css-loader": "^4.3.0",
-    "eslint": "^7.10.0",
-    "file-loader": "^6.1.0",
-    "html-webpack-plugin": "^4.5.0",
-    "jest": "^26.5.2",
-    "mini-css-extract-plugin": "^0.12.0",
-    "prettier": "^2.1.2",
-    "ts-jest": "^26.4.1",
-    "typescript": "^4.0.3",
-    "url-loader": "^4.1.0",
-    "webpack": "^4.44.2"
+    "@types/jest": "^26.0.20",
+    "@types/node": "^14.14.22",
+    "@typescript-eslint/parser": "^4.14.0",
+    "css-loader": "^5.0.1",
+    "eslint": "^7.18.0",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "5.0.0-beta.6",
+    "jest": "^26.6.3",
+    "mini-css-extract-plugin": "^1.3.4",
+    "prettier": "^2.2.1",
+    "ts-jest": "^26.4.4",
+    "typescript": "^4.1.3",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.17.0"
   }
 }

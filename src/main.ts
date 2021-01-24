@@ -2,7 +2,7 @@ import type {
   default as HtmlWebpackPluginInstance,
   HtmlTagObject,
 } from 'html-webpack-plugin';
-import type {compilation, Compiler, Plugin} from 'webpack';
+import type {Compilation, Compiler, WebpackPluginInstance} from 'webpack';
 
 declare namespace HtmlWebpackInjectPreload {
   interface Options {
@@ -42,7 +42,7 @@ interface HtmlWebpackPluginData {
  *
  * @class InjectPreloadFiles
  */
-class HtmlWebpackInjectPreload implements Plugin {
+class HtmlWebpackInjectPreload implements WebpackPluginInstance {
   private options: HtmlWebpackInjectPreload.Options = {
     files: [],
   };
@@ -78,7 +78,7 @@ class HtmlWebpackInjectPreload implements Plugin {
   };
 
   private addLinks(
-    compilation: compilation.Compilation,
+    compilation: Compilation,
     htmlPluginData: HtmlWebpackPluginData,
   ) {
     const assets = new Set(Object.keys(compilation.assets));
@@ -101,10 +101,13 @@ class HtmlWebpackInjectPreload implements Plugin {
         href = href[0] === '/' ? href : '/' + href;
 
         if (file.match.test(asset)) {
-          const preload = {
+          const preload: HtmlTagObject = {
             tagName: 'link',
             attributes: Object.assign(file.attributes, {rel: 'preload', href}),
             voidTag: true,
+            meta: {
+              plugin: 'html-webpack-inject-preload'
+            }
           };
 
           if (linkIndex > -1) {

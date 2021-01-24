@@ -7,4 +7,9 @@
 body {
   font-family: Roboto, sans-serif;
   background-color: red;
+  color: white;
+}
+
+body::before {
+  content: 'Hello world'
 }
