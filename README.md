@@ -1,11 +1,17 @@
+[![npm](https://img.shields.io/npm/dw/@principalstudio/html-webpack-inject-preload)](https://www.npmjs.com/package/@principalstudio/html-webpack-inject-preload)
+
+[![node-current](https://img.shields.io/node/v/@principalstudio/html-webpack-inject-preload)](https://nodejs.org/)
+
+
+
 # HTML Webpack Inject Preload
-A [HTML Webpack Plugin](https://github.com/jantimon/html-webpack-plugin) for injecting &lt;link rel='preload'>
+A [HTML Webpack Plugin](https://github.com/jantimon/html-webpack-plugin) for injecting [&lt;link rel='preload'>](https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content)
 
 This plugin allows to add preload links anywhere you want.
 
 # Installation
 
-You need to have HTMLWebpackPlugin v5 to make this plugin work.
+You need to have HTMLWebpackPlugin v4 or v5 to make this plugin work.
 
 ```
 npm i -D @principalstudio/html-webpack-inject-preload
