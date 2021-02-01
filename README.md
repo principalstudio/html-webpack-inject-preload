@@ -1,6 +1,4 @@
-[![npm](https://img.shields.io/npm/dw/@principalstudio/html-webpack-inject-preload)](https://www.npmjs.com/package/@principalstudio/html-webpack-inject-preload)
-
-[![node-current](https://img.shields.io/node/v/@principalstudio/html-webpack-inject-preload)](https://nodejs.org/)
+[![npm](https://img.shields.io/npm/dw/@principalstudio/html-webpack-inject-preload)](https://www.npmjs.com/package/@principalstudio/html-webpack-inject-preload) [![node-current](https://img.shields.io/node/v/@principalstudio/html-webpack-inject-preload)](https://nodejs.org/)
 
 
 
