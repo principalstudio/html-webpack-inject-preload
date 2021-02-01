@@ -99,3 +99,4 @@ src/*.js
 __tests__/CHANGELOG-heavy.md
 lib
 test/dist/
+package-lock.json
