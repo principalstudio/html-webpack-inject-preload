@@ -1,6 +1,6 @@
 {
   "name": "@principalstudio/html-webpack-inject-preload",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "A HTML Webpack plugin for injecting <link rel='preload'>",
   "main": "lib/main.js",
   "types": "lib/main.d.ts",
@@ -47,7 +47,7 @@
     "webpack": "^5.17.0"
   },
   "peerDependencies": {
-    "webpack": "^4.0.0 || ^5.0.0",
-    "html-webpack-plugin": "4.0.0 || next"
+    "webpack": "4.0.0 || 5.0.0",
+    "html-webpack-plugin": "4.0.0 || 5.0.0"
   }
 }
