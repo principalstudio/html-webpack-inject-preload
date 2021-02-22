@@ -1,5 +1,6 @@
 {
   "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "workbench.colorCustomizations": {
     "statusBar.background": "#000000",
     "statusBar.foreground": "#e7e7e7",

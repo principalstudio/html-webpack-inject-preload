@@ -32,11 +32,11 @@ module.exports = {
     new HtmlWebpackInjectPreload({
       files: [
         {
-          match: /.*\.woff2/,
+          match: /.*\.woff2$/,
           attributes: {as: 'font', type: 'font/woff2', crossorigin: true },
         },
         {
-          match: /vendors\.[a-z-0-9]*.css/,
+          match: /vendors\.[a-z-0-9]*.css$/,
           attributes: {as: 'style' },
         },
       ]

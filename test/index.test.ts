@@ -1,14 +1,14 @@
 import HtmlWebpackInjectPreload from '../src/main';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import webpack, { WebpackPluginInstance } from 'webpack';
+import webpack, {WebpackPluginInstance} from 'webpack';
 import path from 'path';
 import fs from 'fs';
 
 const options: HtmlWebpackInjectPreload.Options = {
   files: [
     {
-      match: /.*\.woff2/,
+      match: /.*\.woff2$/,
       attributes: {
         as: 'font',
         type: 'font/woff2',
@@ -16,7 +16,15 @@ const options: HtmlWebpackInjectPreload.Options = {
       },
     },
     {
-      match: /.*\.css/,
+      match: /.*\.woff$/,
+      attributes: {
+        as: 'font',
+        type: 'font/woff',
+        crossorigin: true,
+      },
+    },
+    {
+      match: /.*\.css$/,
       attributes: {as: 'style', href: 'test-alt.css'},
     },
     {

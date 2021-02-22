@@ -81,11 +81,13 @@ class HtmlWebpackInjectPreload implements WebpackPluginInstance {
     compilation: Compilation,
     htmlPluginData: HtmlWebpackPluginData,
   ) {
+    //Get assets name
     const assets = new Set(Object.keys(compilation.assets));
     compilation.chunks.forEach(chunk => {
       chunk.files.forEach((file: string) => assets.add(file));
     });
 
+    //Find first link index to inject before
     const linkIndex = htmlPluginData.headTags.findIndex(
       tag => tag.tagName === 'link',
     );
@@ -93,26 +95,37 @@ class HtmlWebpackInjectPreload implements WebpackPluginInstance {
     assets.forEach(asset => {
       for (let index = 0; index < this.options.files.length; index++) {
         const file = this.options.files[index];
-        let href = file.attributes ? file.attributes.href : false;
-        if (!href) {
-          href = asset;
-        }
-
-        href = href[0] === '/' ? href : '/' + href;
 
         if (file.match.test(asset)) {
+          let href =
+            file.attributes && file.attributes.href
+              ? file.attributes.href
+              : false;
+          if (href === false || typeof href === 'undefined') {
+            href = asset;
+          }
+          href = href[0] === '/' ? href : '/' + href;
+
           const preload: HtmlTagObject = {
             tagName: 'link',
-            attributes: Object.assign(file.attributes, {rel: 'preload', href}),
+            attributes: Object.assign(
+              {
+                rel: 'preload',
+                href,
+              },
+              file.attributes,
+            ),
             voidTag: true,
             meta: {
-              plugin: 'html-webpack-inject-preload'
-            }
+              plugin: 'html-webpack-inject-preload',
+            },
           };
 
           if (linkIndex > -1) {
+            //before link
             htmlPluginData.headTags.splice(linkIndex, 0, preload);
           } else {
+            // before everything
             htmlPluginData.headTags.unshift(preload);
           }
         }
