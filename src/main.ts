@@ -16,9 +16,10 @@ declare namespace HtmlWebpackInjectPreload {
 }
 
 interface HtmlWebpackPluginData {
-  headTags: Array<HtmlTagObject | HtmlTagObject>;
-  bodyTags: Array<HtmlTagObject | HtmlTagObject>;
+  headTags: HtmlWebpackPluginInstance.HtmlTagObject[];
+  bodyTags: HtmlWebpackPluginInstance.HtmlTagObject[];
   outputName: string;
+  publicPath: string;
   plugin: HtmlWebpackPluginInstance;
 }
 
@@ -29,12 +30,12 @@ interface HtmlWebpackPluginData {
  * new HtmlWebpackInjectPreload({
  *  files: [
  *    {
- *      match: /.*\.woff2/,
+ *      match: /.*\.woff2/$,
  *      attributes: { rel: 'preload', as: 'font', type: 'font/woff2',
  * crossorigin: true },
  *    },
  *    {
- *      match: /vendors\.[a-z-0-9]*.css/,
+ *      match: /vendors\.[a-z-0-9]*.css/$,
  *      attributes: { rel: 'preload', as: 'style' },
  *    },
  *  ],
@@ -104,7 +105,7 @@ class HtmlWebpackInjectPreload implements WebpackPluginInstance {
           if (href === false || typeof href === 'undefined') {
             href = asset;
           }
-          href = href[0] === '/' ? href : '/' + href;
+          href = href[0] === '/' ? href : htmlPluginData.publicPath + href;
 
           const preload: HtmlTagObject = {
             tagName: 'link',
@@ -140,7 +141,7 @@ class HtmlWebpackInjectPreload implements WebpackPluginInstance {
       const HtmlWebpackPlugin = this.extractHtmlWebpackPluginModule(compiler);
       if (!HtmlWebpackPlugin) {
         throw new Error(
-          'HtmlWebpackInjectPreload needs to be used with html-webpack-plugin@4',
+          'HtmlWebpackInjectPreload needs to be used with html-webpack-plugin 4 or 5',
         );
       }
 
