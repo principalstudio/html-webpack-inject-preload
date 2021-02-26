@@ -82,6 +82,30 @@ class HtmlWebpackInjectPreload implements WebpackPluginInstance {
     compilation: Compilation,
     htmlPluginData: HtmlWebpackPluginData,
   ) {
+    //Get public path
+    //html-webpack-plugin v5
+    let publicPath = htmlPluginData.publicPath;
+
+    //html-webpack-plugin v4
+    if (typeof publicPath === 'undefined') {
+      if (
+        htmlPluginData.plugin.options?.publicPath &&
+        htmlPluginData.plugin.options?.publicPath !== 'auto'
+      ) {
+        publicPath = htmlPluginData.plugin.options?.publicPath;
+      } else {
+        publicPath =
+          typeof compilation.options.output.publicPath === 'string'
+            ? compilation.options.output.publicPath
+            : '/';
+      }
+
+      //prevent wrong url
+      if (publicPath[publicPath.length - 1] !== '/') {
+        publicPath = publicPath + '/';
+      }
+    }
+
     //Get assets name
     const assets = new Set(Object.keys(compilation.assets));
     compilation.chunks.forEach(chunk => {
@@ -105,7 +129,7 @@ class HtmlWebpackInjectPreload implements WebpackPluginInstance {
           if (href === false || typeof href === 'undefined') {
             href = asset;
           }
-          href = href[0] === '/' ? href : htmlPluginData.publicPath + href;
+          href = href[0] === '/' ? href : publicPath + href;
 
           const preload: HtmlTagObject = {
             tagName: 'link',
