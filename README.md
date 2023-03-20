@@ -50,6 +50,7 @@ module.exports = {
 * files: An array of files object
   * match: A regular expression to target files you want to preload
   * attributes: Any attributes you want to use. The plugin will add the attribute `rel="preload"` by default.
+* entryPointWebpackPreload: boolean. support `/* webpackPreload: true */ ` magic comment, when preloading files in initial chunk, see this [issue](https://github.com/jantimon/html-webpack-plugin/issues/1317) in detail. `crossorigin` for font will be add automatically.
 
 **Usage**
 

@@ -9,4 +9,5 @@
   "peacock.color": "#000000",
   "peacock.affectActivityBar": false,
   "peacock.affectTitleBar": false,
+  "liveServer.settings.multiRootWorkspaceName": "html-webpack-inject-preload",
 }
