@@ -2,11 +2,17 @@ import type {
   default as HtmlWebpackPluginInstance,
   HtmlTagObject,
 } from 'html-webpack-plugin';
-import type {Compilation, Compiler, WebpackPluginInstance} from 'webpack';
+import type { Compilation, Compiler, WebpackPluginInstance } from 'webpack';
+import { addLinkForEntryPointWebpackPreload } from './entry-point-webpack-preload';
 
 declare namespace HtmlWebpackInjectPreload {
   interface Options {
-    files: HtmlWebpackInjectPreload.File[];
+    files?: HtmlWebpackInjectPreload.File[];
+    /**
+     * generate link tag for `import()`s in a entry chunk
+     * @defaultValue false
+     */
+    entryPointWebpackPreload?: boolean;
   }
 
   interface File {
@@ -46,6 +52,7 @@ interface HtmlWebpackPluginData {
 class HtmlWebpackInjectPreload implements WebpackPluginInstance {
   private options: HtmlWebpackInjectPreload.Options = {
     files: [],
+    entryPointWebpackPreload: false
   };
 
   /**
@@ -106,6 +113,11 @@ class HtmlWebpackInjectPreload implements WebpackPluginInstance {
       }
     }
 
+    // generate link tag for `import()`s in a entry chunk
+    if (this.options.entryPointWebpackPreload) {
+      addLinkForEntryPointWebpackPreload(compilation, htmlPluginData);
+    }
+
     //Get assets name
     const assets = new Set(Object.keys(compilation.assets));
     compilation.chunks.forEach(chunk => {
@@ -116,10 +128,13 @@ class HtmlWebpackInjectPreload implements WebpackPluginInstance {
     const linkIndex = htmlPluginData.headTags.findIndex(
       tag => tag.tagName === 'link',
     );
-
+    const files = this.options.files;
+    if (!files) {
+      return;
+    }
     assets.forEach(asset => {
-      for (let index = 0; index < this.options.files.length; index++) {
-        const file = this.options.files[index];
+      for (let index = 0; index < files.length; index++) {
+        const file = files[index];
 
         if (file.match.test(asset)) {
           let href =
@@ -185,3 +200,5 @@ class HtmlWebpackInjectPreload implements WebpackPluginInstance {
 }
 
 export = HtmlWebpackInjectPreload;
+// exports.default = HtmlWebpackInjectPreload;
+// module.exports = HtmlWebpackInjectPreload;

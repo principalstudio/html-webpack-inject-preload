@@ -100,3 +100,4 @@ __tests__/CHANGELOG-heavy.md
 lib
 test/dist/
 package-lock.json
+test/**/dist
