@@ -22,7 +22,7 @@ export function addLinkForEntryPointWebpackPreload(
 
     // Prepare link tags for HtmlWebpackPlugin
     const publicPath = getPublicPath(compilation, htmlPluginData);
-    const entryHtmlTagObjectMap = generateHtmlTagObject(entryFileMap, publicPath);
+    const entryHtmlTagObjectMap = generateHtmlTagObject(entryFileMap, publicPath, compilation);
     
     // Related files's link tags should follow parent script tag (the entries scripts' tag)
     // according to this [blog](https://web.dev/priority-hints/#using-preload-after-chrome-95).
@@ -89,20 +89,20 @@ function prepareEntryFileMap(
  * @param publicPath 
  * @returns 
  */
-function generateHtmlTagObject(entryFileMap: Map<string, Set<string>>, publicPath: string): Map<EntryName, Set<HtmlTagObject>> {
+function generateHtmlTagObject(entryFileMap: Map<string, Set<string>>, publicPath: string, compilation: Compilation): Map<EntryName, Set<HtmlTagObject>> {
     const map = new Map();
     for (const [key, filesNames] of entryFileMap) {
         map.set(key, [...filesNames].map(fileName => {
             const href = `${publicPath}${fileName}`;
             const as = getTypeOfResource(fileName);
-            const crossOrigin = as === 'font';
+            const crossOrigin = as === 'font' ? 'anonymous' : compilation.outputOptions.crossOriginLoading;
             let attributes: HtmlTagObject['attributes'] = {
                 rel: 'preload',
                 href,
                 as
             }
             if (crossOrigin) {
-                attributes = { ...attributes, crossorigin: undefined }
+                attributes = { ...attributes, crossorigin: crossOrigin }
             }
             return {
                 tagName: 'link',
