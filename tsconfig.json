@@ -20,5 +20,5 @@
     ],
     "declaration": true,
   },
-  "exclude": ["node_modules", "**/*.test.ts", "lib"],
+  "exclude": ["node_modules", "test", "lib"],
 }
