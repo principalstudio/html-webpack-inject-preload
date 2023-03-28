@@ -2,6 +2,7 @@ import webpack from 'webpack';
 import { getWebpackConfig } from '../../webpack-base-config';
 import path from 'path';
 import fs from 'fs';
+import { expectSuccessfulBuild } from '../utils';
 
 describe('HTMLWebpackInjectPreload test entry point webpack preload', () => {
     it('should add preload link tag for js await imported by initial chunk, with \'script\ as attribute', done => {
@@ -9,13 +10,8 @@ describe('HTMLWebpackInjectPreload test entry point webpack preload', () => {
         const compiler = webpack(config);
 
         compiler.run((err, stats) => {
-            if (err) expect(err).toBeNull();
+            expectSuccessfulBuild(err, stats);
             
-            const statsErrors = stats ? stats.compilation.errors : [];
-            if (statsErrors.length > 0) {
-                console.error(statsErrors);
-            }
-            expect(statsErrors.length).toBe(0);
             const html = fs.readFileSync(
                 path.join(__dirname, 'dist/index.html'),
                 'utf8',

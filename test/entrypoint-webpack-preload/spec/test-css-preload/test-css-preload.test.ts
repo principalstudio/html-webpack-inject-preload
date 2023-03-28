@@ -2,8 +2,8 @@ import webpack from 'webpack';
 import { getWebpackConfig } from '../../webpack-base-config';
 import path from 'path';
 import fs from 'fs';
-import { mergeWithCustomize, customizeArray, merge } from 'webpack-merge';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import { expectSuccessfulBuild } from '../utils';
 
 describe('HTMLWebpackInjectPreload test entry point webpack preload for css', () => {
     it('should add preload link tag for css await imported by initial chunk, with \'style\ as attribute', done => {
@@ -13,13 +13,7 @@ describe('HTMLWebpackInjectPreload test entry point webpack preload for css', ()
         const compiler = webpack(config);
 
         compiler.run((err, stats) => {
-            if (err) expect(err).toBeNull();
-            
-            const statsErrors = stats ? stats.compilation.errors : [];
-            if (statsErrors.length > 0) {
-                console.error(statsErrors);
-            }
-            expect(statsErrors.length).toBe(0);
+            expectSuccessfulBuild(err, stats);
             const html = fs.readFileSync(
                 path.join(__dirname, 'dist/index.html'),
                 'utf8',
